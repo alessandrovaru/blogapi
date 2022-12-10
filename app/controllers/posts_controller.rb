@@ -1,4 +1,5 @@
 class PostsController < ApplicationController
+  include Secured
   before_action :authenticate_user!, only: [:create, :update]
 
   rescue_from Exception do |e|
@@ -51,18 +52,5 @@ class PostsController < ApplicationController
     params.require(:post).permit(:title, :content, :published)
   end
 
-  def authenticate_user!
-    #Leer el Header e identificar que sea valido y token de usuario
-    token_regex = /Bearer (\w+)/
-    #Leer el Header
-    headers = request.headers
-    if headers['Authorization'].present? && headers['Authorization'].match(token_regex)
-      token = headers['Authorization'].match(token_regex)[1]
-      if(Current.user = User.find_by_auth_token(token))
-        return
-      end
-    end
-
-    render json: {error: 'Unauthorized'}, status: :unauthorized
-  end
+  
 end
